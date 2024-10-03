@@ -8,9 +8,6 @@ import re
 import requests
 from opensearchpy import OpenSearch # low level client
 
-# import feedback_logger
-# from environ import AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, SERPER_API_KEY, AOS_HOST, AOS_PWD, AOS_UNAME, AZURE_OPENAI_EMBED_KEY, AZURE_OPENAI_DEPLOYMENT
-# from prompts import SUMMARIZE_PROMPT, INQUIRY_PROMPT_WITH_TOOLS, ANSWERING_PROMPT, IMAGE_PROMPT
 from langchain_community.utilities import GoogleSerperAPIWrapper
 from langchain_aws import ChatBedrock
 from openai import AzureOpenAI
@@ -29,12 +26,6 @@ from langchain_community.vectorstores import OpenSearchVectorSearch
 # Callbacks
 from langchain_community.callbacks.manager import get_bedrock_anthropic_callback
 from langchain_community.callbacks.manager import get_openai_callback
-
-AZURE_OPENAI_API_KEY = "aa399c19184d4704a059e787e1dd7c79"
-AZURE_OPENAI_DEPLOYMENT = "gpt-4o-mini"
-AZURE_OPENAI_ENDPOINT = "https://intern-2024-h2.openai.azure.com/"
-GOOGLE_API_KEY = "AIzaSyB3dKFOUjjcTXAoXLFzQ63hqCgxkWAS8FU"
-AZURE_OPENAI_EMBEDDING_KEY = "text-embedding-3-small"
 
 bedrock_client = boto3.client('bedrock-runtime', region_name='us-east-1')
 session = boto3.Session()

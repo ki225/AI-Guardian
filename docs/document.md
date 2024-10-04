@@ -564,7 +564,7 @@ The system uses carefully crafted prompts to guide the AI's responses:
 #### Lambda function
 - General configuration
     - memory: 256 MB
-    - Timeout: 30 sec
+    - Timeout: 30 sec(because API gateway for 29 sec)
 - Environment variables
     - AWS_OPENSEARCH_HOST
     - AWS_OPENSEARCH_PASSWORD

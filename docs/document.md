@@ -411,33 +411,33 @@ Certainly. Here's a more polished and detailed description of the `generate_terr
 
 Inside `generate_rules()`, the following functions are called:
 
-   a. `generate_cus_rule(rule)`: Generates custom rule configurations.
-   b. `generate_package_rule(rule)`: Generates pre-packaged rule configurations.
+   1. `generate_cus_rule(rule)`: Generates custom rule configurations.
+   2. `generate_package_rule(rule)`: Generates pre-packaged rule configurations.
 
 Within `generate_cus_rule()`, these functions are utilized:
 
-   c. `generate_action(rule.Action)`: Defines the action for each rule.
-   d. `generate_statement(rule.Statement)`: Creates the statement for each rule.
+   1. `generate_action(rule.Action)`: Defines the action for each rule.
+   2. `generate_statement(rule.Statement)`: Creates the statement for each rule.
 
 The `generate_statement()` function further delegates to specialized functions based on the statement type:
 
-   e. `generate_match_statement()`
-   f. `generate_not_statement()`
-   g. `generate_or_statement()`
-   h. `generate_and_statement()`
-   i. `generate_rate_based_statement()`
+   1. `generate_match_statement()`
+   2. `generate_not_statement()`
+   3. `generate_or_statement()`
+   4. `generate_and_statement()`
+   5. `generate_rate_based_statement()`
 
 Each of these statement-generating functions may call additional helper functions to handle specific aspects of the WAF rule configuration, such as:
 
-   j. `generate_geo()`
-   k. `generate_ip_set_reference()`
-   l. `generate_label_match()`
-   m. `generate_byte_match()`
-   n. `generate_regex_pattern_set_reference()`
-   o. `generate_regex_match()`
-   p. `generate_size_constraint()`
-   q. `generate_sqli_match()`
-   r. `generate_xss_match()`
+   1. `generate_geo()`
+   2. `generate_ip_set_reference()`
+   3. `generate_label_match()`
+   4. `generate_byte_match()`
+   5. `generate_regex_pattern_set_reference()`
+   6. `generate_regex_match()`
+   7. `generate_size_constraint()`
+   8. `generate_sqli_match()`
+   9. `generate_xss_match()`
 
 These functions collectively form a modular and extensible system for generating complex WAF configurations in Terraform format, catering to a wide range of security rules and policies.
 

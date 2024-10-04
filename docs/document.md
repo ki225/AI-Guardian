@@ -291,10 +291,10 @@ ASGI (Asynchronous Server Gateway Interface) is a specification for asynchronous
 Hypercorn is an ASGI web server based on the sans-io hyper, h11, h2, and wsproto libraries. Key configuration settings include:
 
 Server Socket
-- `bind`: The host/address to bind to. [['127.0.0.1:8000']]
-- `workers`: The number of workers to spawn and use. [1]
-- `worker_class`: The type of worker to use. ["asyncio"]
-- `threads`: The number of threads per worker to use. [1]
+- `bind`: The host/address to bind to.
+- `workers`: The number of workers to spawn and use. 
+- `worker_class`: The type of worker to use. e.g. "asyncio"
+- `threads`: The number of threads per worker to use. 
 
 Security
 - `ca_certs`: Path to the SSL CA certificate file
@@ -385,25 +385,283 @@ Quart is a Fast Python web microframework, we use it consider the following adva
 
 ### Key Functionalities
 #### Request Validation
+- **Pydantic for validating JSON input:**
+Pydantic emerges as a robust Python library for data validation and settings management, harnessing the power of type annotations to safeguard data integrity and optimize development workflows. It excels in automating JSON Schema generation, simplifying API documentation. With its strong typing system, Pydantic enforces strict data type checks, significantly reducing the likelihood of runtime errors and enhancing overall code reliability.
+
+The comprehensive details and specifications can be found in the `pydantic_design.md` document. This file contains in-depth information on the design principles, implementation guidelines, and advanced features of our Pydantic-based validation system.
 
 #### Terraform Generation
+The `terraform_generator.py` file serves as a sophisticated tool for converting JSON input into Terraform configurations. This transformation process offers several significant advantages for infrastructure management:
+
+**Abstraction of Complexity**
+
+It allows users to define infrastructure using familiar JSON syntax, abstracting away the intricacies of Terraform's HCL (HashiCorp Configuration Language).
+
+**Dynamic Configuration Generation**
+
+The script can dynamically generate Terraform code based on input parameters, enabling flexible and customizable infrastructure definitions.
+
+The `generate_terraform()` function serves as the primary engine for creating the Terraform configuration file. It manages user credentials and processes various WAF (Web Application Firewall) configurations, including ARN (Amazon Resource Name) and resource type. This function orchestrates the entire generation process by calling several specialized subfunctions. Here's a comprehensive list of the functions it invokes:
+
+1. `TypeAdapter(WAFConfig).validate_python(config)`: Validates and transforms the input JSON configuration.
+2. `get_user_iam_role(user_id)`: Retrieves the IAM role associated with the user.
+3. `generate_rules(waf_config.Rules)`: Constructs the WAF rules configuration.
+
+Certainly. Here's a more polished and detailed description of the `generate_terraform()` function and its dependencies:
+
+Inside `generate_rules()`, the following functions are called:
+
+   a. `generate_cus_rule(rule)`: Generates custom rule configurations.
+   b. `generate_package_rule(rule)`: Generates pre-packaged rule configurations.
+
+Within `generate_cus_rule()`, these functions are utilized:
+
+   c. `generate_action(rule.Action)`: Defines the action for each rule.
+   d. `generate_statement(rule.Statement)`: Creates the statement for each rule.
+
+The `generate_statement()` function further delegates to specialized functions based on the statement type:
+
+   e. `generate_match_statement()`
+   f. `generate_not_statement()`
+   g. `generate_or_statement()`
+   h. `generate_and_statement()`
+   i. `generate_rate_based_statement()`
+
+Each of these statement-generating functions may call additional helper functions to handle specific aspects of the WAF rule configuration, such as:
+
+   j. `generate_geo()`
+   k. `generate_ip_set_reference()`
+   l. `generate_label_match()`
+   m. `generate_byte_match()`
+   n. `generate_regex_pattern_set_reference()`
+   o. `generate_regex_match()`
+   p. `generate_size_constraint()`
+   q. `generate_sqli_match()`
+   r. `generate_xss_match()`
+
+These functions collectively form a modular and extensible system for generating complex WAF configurations in Terraform format, catering to a wide range of security rules and policies.
+
+**Type Safety and Validation**
+
+Utilizing Pydantic models ensures strong typing and built-in validation, reducing errors in the configuration process.
+
+**Modularity and Extensibility**
+
+The code's structure facilitates easy updates and extensions to accommodate new resource types or provider updates.
 
 #### Process Status Management
+**Terraform State Management**:
+Terraform maintains a comprehensive record of the deployment status, capturing the current state of the infrastructure. This state file serves as a crucial reference point for tracking resources, their relationships, and any changes over time.
 
+**Dynamic Status Rendering**:
+A custom Python script `Tf_output.py` is employed to process and transform the Terraform output into a format suitable for front-end display. This script performs the following functions:
+
+- Parses the Terraform state and output logs
+- Extracts relevant deployment information
+- Structures the data in a format optimized for front-end consumption
+- Provides real-time updates on the deployment progress
+- Handles error states and success messages
+- Generates visualizations or summary statistics as needed
 #### S3 Integration
+The following components collectively form a comprehensive and efficient system for managing process information, security rules, serverless functions, and user interface resources, thereby supporting a robust and scalable infrastructure.
 
+- **Process Status Repository**:
+  A dedicated storage solution is implemented to maintain comprehensive records of process statuses. This system captures real-time updates, historical data, and performance metrics, enabling efficient tracking and analysis of operational workflows.
+
+- **Rule Package Management**:
+  A centralized storage mechanism is established for rule packages. This repository serves as a single source of truth for security policies, compliance standards, and custom rule sets. It facilitates version control, easy updates, and seamless distribution of rule configurations across the infrastructure.
+
+- **Lambda Function Library**:
+  A well-organized collection of serverless Lambda functions is maintained, serving as a robust toolkit for various operational tasks. This library includes functions for data processing, integration operations, and automated responses to specific events. It promotes code reusability, reduces development time, and ensures consistent execution of critical tasks.
+
+- **Front-End Asset Management**:
+  A structured storage solution is implemented for front-end resources, including:
+  1. Static assets (HTML, CSS, JavaScript files)
+  2. Media content (images, icons, fonts)
+  3. Client-side application code
+  4. Configuration files for different environments
+  
+  This centralized approach streamlines content delivery, facilitates version management, and enhances the overall performance and reliability of the user interface.
 
 ### Performance Optimizations
+
 #### Asynchronous Processing
+Our system leverages Python's `asyncio` library to implement efficient asynchronous processing, enabling robust multi-user support. This approach offers several key advantages in a high-concurrency environment:
+
+* **Concurrent User Handling**: Facilitates simultaneous interaction with multiple users, allowing the system to process requests from numerous clients without significant performance degradation.
+* **Scalable User Sessions**: Efficiently manages a large number of active user sessions, scaling gracefully as the user base grows without proportional increases in server resources.
+* **Responsive User Experience**: Ensures that long-running tasks for one user do not block or slow down interactions for others, maintaining a smooth and responsive experience for all active users.
+* **Efficient Resource Utilization**: Optimizes CPU and memory usage across multiple user sessions by efficiently managing I/O wait times, leading to cost-effective scaling of user capacity.
+* **Real-time Interaction**: Supports real-time features like live updates and instant messaging across multiple user sessions, enhancing collaborative capabilities.
+
+
+This asynchronous architecture allows our system to maintain high performance and responsiveness even with a large number of concurrent users, making it ideal for applications requiring real-time, multi-user interactions.
 ### Data Management
 #### S3 Architecture
+- `user data`: store deployment status and terraform result files.
+- `opensearch_lib`: store library that need for opensearch lambda functions.
+- `reul_package`: store json files for rules.
+
 #### DynamoDB Integration
+We integrate Amazon DynamoDB to manage chatbot history in conjunction with LangChain, Here are the key functions in the code that utilize DynamoDB for managing chatbot history:
+
+1. `get_dynamodb_chat_history(session_id: str)`:
+   This function creates and returns a DynamoDBChatMessageHistory object, which is a LangChain utility for storing chat messages in DynamoDB. It takes the following parameters:
+   - `table_name`: Set to "session-test", indicating the DynamoDB table where chat histories are stored.
+   - `session_id`: A unique identifier for each conversation session.
+   - `primary_key_name`: Set to "session_id", specifying the name of the primary key in the DynamoDB table.
+
+   This function enables the retrieval and storage of chat messages for a specific session.
+
+2. `create_historical_chain(chain, agent_type)`:
+   This function wraps a given chain with message history functionality:
+   - It uses `RunnableWithMessageHistory` to create a chain that can access and update the chat history.
+   - The `get_dynamodb_chat_history` function is passed as an argument, allowing the chain to interact with DynamoDB.
+   - It specifies "input" as the key for new messages and "chat_history" as the key for historical messages.
+
+3. `process_messages(session_id: str, messages: str, agent_type: str, chain, user_id="123")`:
+   This function processes incoming messages within the context of a conversation:
+   - It creates a historical chain using `create_historical_chain`.
+   - Retrieves the chat history for the given session_id using `get_dynamodb_chat_history`.
+   - Constructs the input for the chain, including the new message, chat history, and user ID.
+   - Invokes the historical chain with this input, which implicitly handles the reading and writing of messages to DynamoDB.
+
+These functions work together to:
+- Maintain separate chat histories for different conversation sessions.
+- Seamlessly integrate DynamoDB storage with LangChain's conversation flow.
+- Provide context from previous messages to inform the AI's responses.
+- Handle the persistence and retrieval of conversation data without explicit DynamoDB query operations in the main logic.
+
 
 ### AI Model Integration
-        * 9.7.1 OpenAI GPT-4 Implementation
-        * 9.7.2 Amazon Bedrock Integration
-        * 9.7.3 Prompt Engineering and Management
+#### Langchain Implementation
+- `AzureChatOpenAI`:
+    - Integrates Azure's OpenAI service as the language model backend.
+    - Configured with specific endpoint, deployment, and API version.
+    - Set to deterministic output (temperature=0) for consistent responses.
+- `ChatPromptTemplate`:
+    - Used to create structured prompts for different conversation scenarios (e.g., RULE_CHOICE_PROMPT, JSON_GENERATOR_PROMPT).
+    - Enables dynamic prompt generation based on user input and conversation context.
+- `StrOutputParser`:
+    - Processes the raw output from the language model into a string format.
+- `DynamoDBChatMessageHistory`:
+    - Leverages AWS DynamoDB to store and retrieve conversation history.
+    - Enables persistent, scalable storage of chat sessions.
+- `RunnableWithMessageHistory`:
+    - Integrates chat history into the conversation flow.
+    - Allows for context-aware responses by considering previous interactions.
+#### Amazon Bedrock Integration
+Amazon Bedrock is a fully managed service that makes foundation models (FMs) from leading AI companies accessible via an API, allowing developers to build and scale generative AI applications quickly and easily. In our system, we use Claude as the base model and integrate it with AWS Lambda function and LangChain.
+
+#### Prompt Engineering and Management
+
+The system uses carefully crafted prompts to guide the AI's responses:
+- `PROFESSIONALISM_PROMPT`: Determines the user's intent and categorizes queries.
+- `RULE_CHOICE_PROMPT`: Guides users in selecting appropriate WAF rule packages.
+- `JSON_GENERATOR_PROMPT`: Assists in gathering necessary information for WAF configuration.
+- `JSON_OUTPUT_PROMPT`: Generates the final JSON configuration for WAF setup.
+
+#### Lambda function
+- General configuration
+    - memory: 256 MB
+    - Timeout: 30 sec
+- Environment variables
+    - AWS_OPENSEARCH_HOST
+    - AWS_OPENSEARCH_PASSWORD
+    - AWS_OPENSEARCH_USERNAME
+    - AZURE_OPENAI_API_KEY
+    - AZURE_OPENAI_DEPLOYMENT
+    - AZURE_OPENAI_EMBEDDING_KEY
+    - AZURE_OPENAI_ENDPOINT
+- Layers
+    - AWSLambdaPowertoolsPythonV2
+        - version: newest
+    - Self create
+        - Compatible runtimes: Python 3.9
+        - detailed as below `Library` part
+- Library
+    - langchain
+    - langchain-openai
+    - openai
+    - langchain-core
+    - nvdlib
+    - langchain_community
+
+#### Permissions
+- AmazonBedrock
+- AmazonDynamoDB
+- AmazonOpenSearchService
+- AmazonS3
+- AWSLambda
+- AWSLambdaBasicExecutionRole
+- AWSXrayWriteOnlyAccess
+
+
 ### Rule Package Management
-        * 9.8.1 Testing Methodologies
+#### Testing Methodologies
+We use sqlmap tool for testing our regex rule package.
+
 ### Customer Credential Management
-        * 9.9.1 IAM Trust Relationships
+#### Setting Up IAM Trust Relationships for Cross-Account Terraform Deployments
+
+When managing infrastructure across multiple AWS accounts using Terraform, it's crucial to establish secure and efficient access mechanisms. This article outlines the process of setting up IAM Trust Relationships to enable Terraform to assume roles and deploy resources in other AWS accounts using the AWS Security Token Service (STS).
+
+The core idea is to allow Terraform running in Account A to assume a role in Account B, granting it the necessary permissions to create and manage resources in Account B. This is achieved through a combination of IAM roles, policies, and trust relationships.
+Steps to Implement Cross-Account Access
+
+1. Create an IAM Role in the Target Account (Account B)
+First, create a role in the account where Terraform will be deploying resources:
+    - Sign in to the AWS Management Console for Account B.
+    - Navigate to IAM > Roles > Create Role.
+    - Choose "Another AWS account" as the trusted entity.
+    - Enter the Account ID of the source account (Account A).
+    - Attach the necessary permissions policies (e.g., PowerUserAccess for broad permissions).
+2. Configure the Trust Relationship
+    
+    Replace ACCOUNT-A-ID with the actual ID of Account A.
+    ```json
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::ACCOUNT-A-ID:root"
+            },
+            "Action": "sts:AssumeRole",
+            "Condition": {}
+            }
+        ]
+    }
+    ```
+3. Create an IAM User or Role in the Source Account (Account A)
+
+    In Account A, create an IAM user or role that Terraform will use:
+
+    - Navigate to IAM > Users > Create User (or Roles > Create Role).
+    - Attach a policy that allows assuming the role in Account B:
+
+    Replace ACCOUNT-B-ID and ROLE-NAME-IN-ACCOUNT-B with the appropriate values
+    ```json
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+            "Effect": "Allow",
+            "Action": "sts:AssumeRole",
+            "Resource": "arn:aws:iam::ACCOUNT-B-ID:role/ROLE-NAME-IN-ACCOUNT-B"
+            }
+        ]
+    }
+    ```
+4. Configure Terraform to Use STS
+
+    In your Terraform configuration, use the aws provider with the assume_role block:
+    ```hcl
+    provider "aws" {
+        region = "us-west-2"
+        assume_role {
+            role_arn = "arn:aws:iam::ACCOUNT-B-ID:role/ROLE-NAME-IN-ACCOUNT-B"
+        }
+    }
+    ```

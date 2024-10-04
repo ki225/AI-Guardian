@@ -59,6 +59,16 @@ For resource type abbreviations:
                         "action": ""
                     }
                 ]
+            },
+            "CVE": {
+                "mode": "",
+                "CVE-set": [
+                    {
+                        "rule_id": "",
+                        "chosen": "",
+                        "action": ""
+                    }
+                ]
             }
         },
         "rule_created": [

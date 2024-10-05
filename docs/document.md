@@ -57,6 +57,7 @@
         * 9.7.1 OpenAI GPT-4 Implementation
         * 9.7.2 Amazon Bedrock Integration
         * 9.7.3 Prompt Engineering and Management
+        * IAM permissions implement
     * 9.8 Rule Package Management
         * 9.8.1 Testing Methodologies
     * 9.9 Customer Credential Management
@@ -221,6 +222,48 @@ While AWS Marketplace offers various rule packages for WAF implementation, sever
 
 Cloud Infrastructure
 ---
+![](../img/full-cloud-infra.drawio.png)
+
+1. User interaction and authentication:
+   - Users interact with the system through CloudFront, which provides content delivery and caching.
+   - Authentication is handled by Cognito.
+   - The web application is accessed through a web page.
+
+2. API Gateway and request handling:
+   - Requests are routed through multiple API Gateways (HTTP API, REST API, and Edge API GW).
+   - Lambda functions are used to process requests and trigger other services.
+
+3. VPC and networking:
+   - The main application components are within a VPC.
+   - The VPC contains public and private subnets across multiple availability zones for high availability.
+   - A Network Load Balancer distributes traffic to the web servers.
+   - NAT Gateway allows private subnet resources to access the internet.
+
+4. Application layer:
+   - Web Servers & App are deployed in a private subnet, protected by a security group.
+   - S3 is used for object storage, likely for static assets or data.
+
+5. AI and data processing:
+   - An AI processing pipeline includes Claude and OpenAI models.
+   - BedRock is used, possibly for model serving or orchestration.
+   - OpenSearch is employed for search functionality.
+   - LangChain is utilized, likely for natural language processing tasks.
+
+6. Data storage and management:
+   - DynamoDB is used as a NoSQL database.
+   - Lambda functions interact with the database.
+
+7. Monitoring and security:
+   - CloudWatch is used for monitoring and logging.
+   - AWS WAF (Web Application Firewall) provides additional security.
+
+8. External integrations:
+   - The system connects to an external CVE (Common Vulnerabilities and Exposures) Data List.
+
+9. Serverless components:
+   - Multiple Lambda functions are used throughout the architecture for various processing tasks.
+
+
 
 Front-end Development
 ---
@@ -234,7 +277,48 @@ Key features include:
 •	Markdown rendering for AI responses
 •	Progress tracking for WAF deployment
 
+Middleware
+---
+### RESTful API Architecture
+```
+├── v1
+    ├── waf 
+    |   ├── ip-blocks                    
+    |   |      ├── Post
+    |   |      ├── Options
+    |   |      ├── Get   
+    |   |              
+    |   ├──  rules     
+    |   |      ├── Post
+    |   |      ├── Options
+    |   |      ├── Get  
+    |
+    ├── webpage
+        ├── Post
+        ├── Options
+        ├── Get
+```
+### Resource and Method Definitions
+#### waf
+The deployment request will be sent from frontend to backend by calling an AWS Lambda function through an API Gateway. 
 
+- Get method
+    
+    Get mothod is for checking the last deployment input information.
+- Options method
+  
+    The OPTIONS method in Amazon API Gateway is used to enable Cross-Origin Resource Sharing (CORS) and to provide information about the allowed methods and headers for a particular API endpoint. This method informs the client which HTTP methods (GET, POST, PUT, etc.) are supported by the API for a specific resource, as well as which headers can be used or exposed in the actual requests. 
+
+    When setting up API Gateway, we typically enable CORS by configuring the OPTIONS method on API resource. The OPTIONS response will include headers like Access-Control-Allow-Methods, Access-Control-Allow-Headers, and Access-Control-Allow-Origin, which inform the browser about the allowed actions.
+- Post method
+    
+    We use the Post method for sending the Json config to backend server.
+
+
+#### webpage
+After the user submits their request, a Terraform file is generated and executed. The webpage displays the progress status of the Terraform deployment by polling. This is achieved by calling an AWS Lambda function through an API Gateway.
+
+### Request/Response Formats
 
 Back-end Systems
 ---
@@ -587,7 +671,7 @@ The system uses carefully crafted prompts to guide the AI's responses:
     - nvdlib
     - langchain_community
 
-#### Permissions
+#### IAM Permissions implement
 - AmazonBedrock
 - AmazonDynamoDB
 - AmazonOpenSearchService

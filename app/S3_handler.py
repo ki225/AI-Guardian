@@ -38,7 +38,8 @@ class S3Handler:
             except ClientError as e:
                 print(f"Error uploading file to S3: {e}")
                 raise
-        
+    
+    # Periodically upload a file which keeps terraform execution status to S3 for polling the frontend
     async def periodic_s3_upload(self, terraform_dir: str, local_file_path: str, bucket_name: str, s3_key: str, stop_event: asyncio.Event) -> None:
         while True:
             try:
@@ -46,6 +47,8 @@ class S3Handler:
                 print("Uploaded to S3 successfully")
             except Exception as e:
                 print(f"Error during periodic S3 upload: {e}")
+                
+            # if WAF ACL is created, stop the periodic upload
             waf_created_result = await check_waf_acl_id(terraform_dir, stop_event)
             if waf_created_result:
                 stop_event.set()

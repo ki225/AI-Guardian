@@ -91,17 +91,17 @@ async def rule_ip():
         
         if new_data:
             try:
-                rules_data, user_id = terraform_generator.generate_terraform(new_data)
+                rules_data, user_id = Terraform_generator.generate_terraform(new_data)
                 sys_status = handle_customer_request(user_id)
                 directory = f"/home/ec2-user/customers/{user_id}"
                 if not os.path.exists(directory):
                     os.makedirs(directory)
 
-                asyncio.create_task(s3_handler.upload_to_s3_with_content_async("kg-for-test", f"user_data/{user_id}", "generated_json.json", new_data))
+                asyncio.create_task(S3_handler.upload_to_s3_with_content_async("kg-for-test", f"user_data/{user_id}", "generated_json.json", new_data))
 
                 with open(f"{directory}/main.tf", 'w') as file:
                     file.write(rules_data)
-                await s3_handler.upload_to_s3_with_content_async("kg-for-test", f"user_data/{user_id}", "main.tf", rules_data)
+                await S3_handler.upload_to_s3_with_content_async("kg-for-test", f"user_data/{user_id}", "main.tf", rules_data)
                 
                 task = asyncio.create_task(terraform_deploy(user_id, sys_status))
 

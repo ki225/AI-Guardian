@@ -22,4 +22,4 @@ AI Guardian streamlines WAF setup compared to traditional methods like AWS WAF c
 ## CLoud Infraustructure
 Detailed description for cloud architecture can be found in our [document](docs/document.md). 
 
-![](img/diagram.png)
+<img width="1726" height="692" alt="image" src="https://github.com/user-attachments/assets/d89b90d9-8a46-4439-bb16-937e578a53a6" />
